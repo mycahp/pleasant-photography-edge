@@ -1,0 +1,5 @@
+[
+  { "printSize": "8x10", "defaultPriceInCents": 2500, "gelatoProductUid": "poster_8x10_TODO" },
+  { "printSize": "12x18", "defaultPriceInCents": 4500, "gelatoProductUid": "poster_12x18_TODO" },
+  { "printSize": "16x24", "defaultPriceInCents": 6500, "gelatoProductUid": "poster_16x24_TODO" }
+]

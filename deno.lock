@@ -1,0 +1,53 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/cli@^1.0.28": "1.0.28",
+    "jsr:@std/fmt@^1.0.9": "1.0.9",
+    "jsr:@std/internal@^1.0.12": "1.0.12",
+    "npm:@bunny.net/edgescript-sdk@~0.12.1": "0.12.1_hono@4.12.0",
+    "npm:stripe@*": "20.3.1"
+  },
+  "jsr": {
+    "@std/cli@1.0.28": {
+      "integrity": "74ef9b976db59ca6b23a5283469c9072be6276853807a83ec6c7ce412135c70a",
+      "dependencies": [
+        "jsr:@std/fmt",
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/fmt@1.0.9": {
+      "integrity": "2487343e8899fb2be5d0e3d35013e54477ada198854e52dd05ed0422eddcabe0"
+    },
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    }
+  },
+  "npm": {
+    "@bunny.net/edgescript-sdk@0.12.1_hono@4.12.0": {
+      "integrity": "sha512-+B+AUnfA+9y6PlyX6BNL2Uk8x3vExRIKKP+rH0r4UnEWRiJZsbuEnZg5Au6pglf67NumP8tOwbrqP9jS4e+jDQ==",
+      "dependencies": [
+        "@hono/node-server",
+        "hono"
+      ]
+    },
+    "@hono/node-server@1.19.9_hono@4.12.0": {
+      "integrity": "sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw==",
+      "dependencies": [
+        "hono"
+      ]
+    },
+    "hono@4.12.0": {
+      "integrity": "sha512-NekXntS5M94pUfiVZ8oXXK/kkri+5WpX2/Ik+LVsl+uvw+soj4roXIsPqO+XsWrAw20mOzaXOZf3Q7PfB9A/IA=="
+    },
+    "stripe@20.3.1": {
+      "integrity": "sha512-k990yOT5G5rhX3XluRPw5Y8RLdJDW4dzQ29wWT66piHrbnM2KyamJ1dKgPsw4HzGHRWjDiSSdcI2WdxQUPV3aQ=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/cli@^1.0.28",
+      "npm:@bunny.net/edgescript-sdk@~0.12.1",
+      "npm:stripe@*"
+    ]
+  }
+}

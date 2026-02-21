@@ -1,0 +1,21 @@
+{
+  "imports": {
+    "fresh": "jsr:@fresh/core@^2.2.0",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.8",
+    "vite": "npm:vite@^7.0.0",
+    "preact": "npm:preact@^10.25.0",
+    "@preact/signals": "npm:@preact/signals@^2.0.0",
+    "@shared/": "../shared/",
+    "stripe": "npm:stripe"
+  },
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "dev": "deno run -A --env-file=../.env npm:vite",
+    "build": "deno run -A npm:vite build",
+    "preview": "deno serve -A _fresh/server.js"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  }
+}

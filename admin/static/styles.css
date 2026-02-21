@@ -1,0 +1,464 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: #f8f9fa;
+  padding: 2rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: #1a1a1a;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: white;
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+  color: #9ca3af;
+}
+
+input[type="file"] {
+  padding: 0.375rem;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+form > label {
+  margin-top: 0.25rem;
+}
+
+form > input[type="text"],
+form > input[type="file"] {
+  margin-bottom: 0.75rem;
+}
+
+button[type="submit"] {
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: #374151;
+}
+
+button[type="submit"]:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* --- Status banners --- */
+
+.status {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.status.success { background: #d1fae5; color: #065f46; }
+.status.error   { background: #fee2e2; color: #991b1b; }
+.status.loading { background: #e0e7ff; color: #3730a3; }
+
+.empty-state {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+/* --- Variant fieldset (upload form + product edit) --- */
+
+.variant-fieldset {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.variant-fieldset legend {
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0 0.25rem;
+}
+
+.variant-header {
+  display: grid;
+  grid-template-columns: 6rem 6.5rem 1fr 1.25rem;
+  gap: 0.5rem;
+  padding-bottom: 0.375rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.variant-row-full {
+  display: grid;
+  grid-template-columns: 6rem 6.5rem 1fr 1.25rem;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.3rem 0;
+}
+
+.variant-size-input,
+.variant-uid-input {
+  width: 100%;
+}
+
+.price-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.price-prefix {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.price-input {
+  width: 100%;
+  text-align: right;
+}
+
+.btn-remove-variant {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 1.25rem;
+  text-align: center;
+  transition: color 0.1s;
+}
+
+.btn-remove-variant:hover {
+  color: #dc2626;
+}
+
+.btn-add-variant {
+  background: none;
+  border: 1px dashed #d1d5db;
+  color: #6b7280;
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.btn-add-variant:hover {
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+/* --- Product list --- */
+
+.product-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.product-card {
+  display: flex;
+  gap: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  align-items: flex-start;
+}
+
+.product-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+  background: #f3f4f6;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+}
+
+.product-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.price-tag {
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.125rem 0.5rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+}
+
+.edit-variants {
+  margin-bottom: 0.5rem;
+}
+
+.edit-variants .variant-header,
+.edit-variants .variant-row-full {
+  grid-template-columns: 5rem 5.5rem 1fr 1.25rem;
+  gap: 0.375rem;
+}
+
+.edit-variants input[type="text"],
+.edit-variants input[type="number"] {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.375rem;
+}
+
+.edit-variants .price-prefix {
+  font-size: 0.75rem;
+}
+
+/* --- Buttons (actions) --- */
+
+.product-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-save,
+.btn-cancel {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-edit {
+  background: none;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.btn-edit:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-delete {
+  background: none;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-save {
+  background: #059669;
+  color: white;
+  border: 1px solid #059669;
+}
+
+.btn-save:hover {
+  background: #047857;
+}
+
+.btn-cancel {
+  background: none;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-cancel:hover {
+  background: #f3f4f6;
+}
+
+.btn-edit:disabled,
+.btn-delete:disabled,
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  margin-left: 0.5rem;
+}
+
+/* --- Edit mode (product list) --- */
+
+.edit-section {
+  width: 100%;
+}
+
+.edit-field {
+  margin-bottom: 0.5rem;
+}
+
+.edit-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.125rem;
+}
+
+.edit-field input[type="text"] {
+  margin-bottom: 0;
+}
+
+.variant-header-edit {
+  display: grid;
+  grid-template-columns: 5rem 5.5rem 1fr 1.5rem;
+  gap: 0.375rem;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.variant-row-edit {
+  display: grid;
+  grid-template-columns: 5rem 5.5rem 1fr 1.5rem;
+  gap: 0.375rem;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.variant-row-edit input[type="text"],
+.variant-row-edit input[type="number"] {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.375rem;
+  margin-bottom: 0;
+}
+
+.variant-row-edit .price-prefix {
+  font-size: 0.75rem;
+}
+
+.variant-row-edit.archived {
+  opacity: 0.4;
+}
+
+.variant-row-edit.archived input {
+  text-decoration: line-through;
+}
+
+.price-readonly {
+  font-size: 0.75rem;
+  color: #6b7280;
+  padding: 0.2rem 0;
+}
+
+.variant-row-new {
+  border-left: 2px solid #059669;
+  padding-left: 0.375rem;
+}
+
+.btn-archive,
+.btn-unarchive {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+  text-align: center;
+  line-height: 1;
+}
+
+.btn-archive {
+  color: #9ca3af;
+}
+
+.btn-archive:hover {
+  color: #dc2626;
+}
+
+.btn-unarchive {
+  color: #059669;
+}
+
+.btn-unarchive:hover {
+  color: #047857;
+}
