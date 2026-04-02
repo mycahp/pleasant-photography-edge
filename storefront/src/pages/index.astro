@@ -1,0 +1,234 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base activePage="home">
+
+	<main class="columns-2 md:columns-3 gap-0.5 pt-11">
+
+		<div id="header-cell" class="break-inside-avoid [column-span:all] md:[column-span:none] py-10 px-8 md:py-6 md:px-6 bg-zinc-900  flex flex-col items-center justify-center gap-1 mb-0.5">
+			<span class="text-3xl leading-none tracking-tight whitespace-nowrap">mycah pleasant</span>
+			<span class="text-2xl tracking-[0.1em] text-blue-500 whitespace-nowrap">photography</span>
+		</div>
+
+		<div id="skeletons" class="contents">
+			<div class="break-inside-avoid mb-0.5 aspect-[3/4] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[4/3] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[2/3] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[5/4] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[3/4] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[16/9] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[4/3] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[3/5] bg-zinc-800 animate-pulse"></div>
+			<div class="break-inside-avoid mb-0.5 aspect-[2/3] bg-zinc-800 animate-pulse"></div>
+		</div>
+
+	</main>
+
+	<!-- Product detail modal -->
+	<div id="product-modal" class="fixed inset-0 z-[200] flex flex-col md:flex-row items-stretch opacity-0 pointer-events-none transition-opacity duration-200" style="background: rgba(9,9,11,0.97);">
+		<!-- Image area — click closes the modal -->
+		<div id="modal-image-area" class="flex-1 flex items-center justify-center p-6 cursor-zoom-out overflow-hidden min-h-0">
+			<img id="modal-img" src="" alt="" class="max-w-full max-h-full object-contain" />
+		</div>
+		<!-- Product panel — clicks here are contained -->
+		<div id="modal-panel" class="md:w-72 bg-zinc-900 border-t md:border-t-0 md:border-l border-zinc-800 flex flex-col shrink-0" style="max-height: 55vh;">
+			<div class="p-5 flex-1 overflow-y-auto flex flex-col gap-5 min-h-0">
+				<div class="flex items-start justify-between">
+					<div class="min-w-0">
+						<h2 id="modal-product-name" class="text-sm tracking-tight leading-snug"></h2>
+						<p id="modal-product-date" class="text-xs text-zinc-500 mt-1"></p>
+					</div>
+					<button id="modal-close" class="text-zinc-500 hover:text-white text-xl leading-none ml-4 transition-colors shrink-0" aria-label="close">×</button>
+				</div>
+				<div>
+					<p class="text-xs text-zinc-500 uppercase tracking-widest mb-2">print size</p>
+					<div id="modal-sizes" class="flex flex-wrap gap-2"></div>
+				</div>
+				<div class="flex items-baseline gap-2">
+					<span id="modal-price" class="text-blue-500 text-lg"></span>
+					<span class="text-xs text-zinc-500">usd</span>
+				</div>
+			</div>
+			<div class="p-5 border-t border-zinc-800 shrink-0">
+				<button id="modal-add-to-cart" class="w-full bg-blue-500 hover:bg-blue-400 text-white py-2.5 text-sm transition-colors tracking-wide">add to cart</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		import { api } from '../lib/api';
+		import { addToCart } from '../lib/cart';
+
+		interface Price {
+			id: string;
+			unitAmount: number;
+			currency: string;
+			printSize: string | null;
+		}
+
+		interface Product {
+			id: string;
+			name: string;
+			description: string | null;
+			imageUrl: string | null;
+			photoDate: string | null;
+			prices: Price[];
+		}
+
+		function formatPrice(cents: number): string {
+			return `$${(cents / 100).toFixed(2)}`;
+		}
+
+		// ---- Nav scroll observer ----
+
+		const headerCell = document.getElementById('header-cell')!;
+		const navBrand = document.getElementById('nav-brand')!;
+		const topNav = document.getElementById('top-nav')!;
+
+		new IntersectionObserver(([entry]) => {
+			const gone = !entry.isIntersecting;
+			navBrand.style.opacity = gone ? '1' : '0';
+			navBrand.style.pointerEvents = gone ? 'auto' : 'none';
+			topNav.style.backgroundColor = gone ? 'rgba(24, 24, 27, 0.75)' : '';
+		}, { threshold: 0 }).observe(headerCell);
+
+		// ---- Product modal ----
+
+		let currentProduct: Product | null = null;
+		let selectedPriceId: string | null = null;
+
+		const productModal = document.getElementById('product-modal')!;
+		const modalImg = document.getElementById('modal-img') as HTMLImageElement;
+		const modalProductName = document.getElementById('modal-product-name')!;
+		const modalProductDate = document.getElementById('modal-product-date')!;
+		const modalSizes = document.getElementById('modal-sizes')!;
+		const modalPrice = document.getElementById('modal-price')!;
+		const modalAddToCartBtn = document.getElementById('modal-add-to-cart') as HTMLButtonElement;
+		const modalClose = document.getElementById('modal-close')!;
+		const modalImageArea = document.getElementById('modal-image-area')!;
+		const modalPanel = document.getElementById('modal-panel')!;
+
+		function openProductModal(product: Product): void {
+			currentProduct = product;
+			modalImg.src = product.imageUrl!;
+			modalImg.alt = product.name;
+			modalProductName.textContent = product.name;
+			modalProductDate.textContent = product.photoDate ?? '';
+
+			const prices = [...product.prices].sort((a, b) => a.unitAmount - b.unitAmount);
+			selectedPriceId = prices[0]?.id ?? null;
+
+			modalSizes.innerHTML = '';
+			for (const price of prices) {
+				const btn = document.createElement('button');
+				btn.textContent = price.printSize ?? price.id;
+				btn.dataset.priceId = price.id;
+				const isSelected = price.id === selectedPriceId;
+				btn.className = isSelected
+					? 'px-3 py-1.5 text-xs border transition-colors border-blue-500 text-blue-500'
+					: 'px-3 py-1.5 text-xs border transition-colors border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200';
+				btn.addEventListener('click', () => selectPrice(price.id));
+				modalSizes.appendChild(btn);
+			}
+
+			updateModalPrice();
+			productModal.classList.remove('opacity-0', 'pointer-events-none');
+			productModal.classList.add('opacity-100', 'pointer-events-auto');
+			document.body.style.overflow = 'hidden';
+		}
+
+		function selectPrice(priceId: string): void {
+			selectedPriceId = priceId;
+			for (const btn of modalSizes.querySelectorAll<HTMLButtonElement>('button')) {
+				const isSelected = btn.dataset.priceId === priceId;
+				btn.className = isSelected
+					? 'px-3 py-1.5 text-xs border transition-colors border-blue-500 text-blue-500'
+					: 'px-3 py-1.5 text-xs border transition-colors border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200';
+			}
+			updateModalPrice();
+		}
+
+		function updateModalPrice(): void {
+			if (!currentProduct || !selectedPriceId) return;
+			const price = currentProduct.prices.find((p) => p.id === selectedPriceId);
+			modalPrice.textContent = price ? formatPrice(price.unitAmount) : '';
+		}
+
+		function closeProductModal(): void {
+			productModal.classList.add('opacity-0', 'pointer-events-none');
+			productModal.classList.remove('opacity-100', 'pointer-events-auto');
+			document.body.style.overflow = '';
+			currentProduct = null;
+			selectedPriceId = null;
+		}
+
+		modalClose.addEventListener('click', closeProductModal);
+		modalImageArea.addEventListener('click', closeProductModal);
+		modalPanel.addEventListener('click', (e) => e.stopPropagation());
+
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !productModal.classList.contains('pointer-events-none')) {
+				closeProductModal();
+			}
+		});
+
+		modalAddToCartBtn.addEventListener('click', () => {
+			if (!currentProduct || !selectedPriceId) return;
+			const price = currentProduct.prices.find((p) => p.id === selectedPriceId);
+			if (!price) return;
+
+			addToCart({
+				priceId: price.id,
+				productId: currentProduct.id,
+				productName: currentProduct.name,
+				printSize: price.printSize ?? price.id,
+				unitAmount: price.unitAmount,
+			});
+
+			const original = modalAddToCartBtn.textContent;
+			modalAddToCartBtn.textContent = 'added!';
+			modalAddToCartBtn.style.backgroundColor = '#16a34a';
+			setTimeout(() => {
+				modalAddToCartBtn.textContent = original;
+				modalAddToCartBtn.style.backgroundColor = '';
+			}, 1200);
+		});
+
+		// ---- Fetch & render products ----
+
+		const mainEl = document.querySelector('main')!;
+		const skeletons = document.getElementById('skeletons')!;
+
+		try {
+			const res = await fetch(api.products);
+			if (!res.ok) throw new Error(`${res.status}`);
+			const products: Product[] = await res.json();
+
+			skeletons.remove();
+
+			for (const product of products) {
+				if (!product.imageUrl) continue;
+
+				const wrapper = document.createElement('div');
+				wrapper.className = 'break-inside-avoid mb-0.5 bg-zinc-800 cursor-pointer';
+
+				const img = document.createElement('img');
+				img.src = product.imageUrl;
+				img.alt = product.name;
+				img.className = 'w-full h-auto block';
+				img.style.opacity = '0';
+				img.style.transition = 'opacity 0.4s ease';
+				img.addEventListener('load', () => { img.style.opacity = '1'; });
+				img.addEventListener('click', () => openProductModal(product));
+
+				wrapper.appendChild(img);
+				mainEl.appendChild(wrapper);
+			}
+		} catch (e) {
+			console.warn('Failed to fetch products:', e);
+			skeletons.remove();
+		}
+	</script>
+
+</Base>

@@ -41,6 +41,7 @@ label {
 
 input[type="text"],
 input[type="number"],
+input[type="date"],
 input[type="file"] {
   display: block;
   width: 100%;
@@ -63,7 +64,8 @@ input[type="file"] {
 }
 
 input[type="text"]:focus,
-input[type="number"]:focus {
+input[type="number"]:focus,
+input[type="date"]:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
@@ -74,6 +76,7 @@ form > label {
 }
 
 form > input[type="text"],
+form > input[type="date"],
 form > input[type="file"] {
   margin-bottom: 0.75rem;
 }
@@ -379,7 +382,8 @@ button[type="submit"]:disabled {
   margin-bottom: 0.125rem;
 }
 
-.edit-field input[type="text"] {
+.edit-field input[type="text"],
+.edit-field input[type="date"] {
   margin-bottom: 0;
 }
 
@@ -461,4 +465,10 @@ button[type="submit"]:disabled {
 
 .btn-unarchive:hover {
   color: #047857;
+}
+
+.product-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0.5rem;
 }

@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="order confirmation — mycah pleasant photography">
+
+	<div class="min-h-screen flex items-center justify-center px-6 pt-16">
+		<div id="status" class="text-center max-w-sm">
+			<p class="text-zinc-400 text-sm">verifying your order...</p>
+		</div>
+	</div>
+
+	<script>
+		import { api } from '../lib/api';
+		import { clearCart } from '../lib/cart';
+
+		const params = new URLSearchParams(window.location.search);
+		const sessionId = params.get('session_id');
+		const el = document.getElementById('status')!;
+
+		if (!sessionId) {
+			el.innerHTML = `<p class="text-red-400 text-sm">invalid order link.</p>`;
+		} else {
+			try {
+				const res = await fetch(api.checkoutStatus(sessionId));
+				if (!res.ok) throw new Error(`${res.status}`);
+				const session = await res.json() as {
+					status: string;
+					payment_status: string;
+					customer_details?: { email: string };
+				};
+
+				if (session.status === 'complete' && session.payment_status === 'paid') {
+					clearCart();
+					el.innerHTML = `
+						<h1 class="text-xl mb-3 tracking-tight">order confirmed</h1>
+						<p class="text-zinc-400 text-sm mb-1">thank you for your purchase.</p>
+						${session.customer_details?.email
+							? `<p class="text-zinc-500 text-xs mb-6">confirmation sent to ${session.customer_details.email}</p>`
+							: '<div class="mb-6"></div>'
+						}
+						<a href="/" class="text-blue-500 text-sm hover:text-blue-400 transition-colors">← back to gallery</a>
+					`;
+				} else {
+					el.innerHTML = `
+						<p class="text-zinc-400 text-sm mb-6">payment was not completed.</p>
+						<a href="/" class="text-blue-500 text-sm hover:text-blue-400 transition-colors">← back to gallery</a>
+					`;
+				}
+			} catch {
+				el.innerHTML = `<p class="text-red-400 text-sm">could not verify order status.</p>`;
+			}
+		}
+	</script>
+
+</Base>

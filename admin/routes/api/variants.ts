@@ -2,7 +2,7 @@ import type { Context } from "fresh";
 import { loadDefaultVariants } from "@shared/types.ts";
 
 export const handler = {
-  async GET(_ctx: Context) {
+  async GET(_ctx: Context<unknown>) {
     try {
       const variants = await loadDefaultVariants();
       return new Response(JSON.stringify(variants), {

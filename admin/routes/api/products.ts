@@ -16,7 +16,7 @@ function jsonResponse(data: unknown, status = 200) {
 }
 
 export const handler = {
-  async GET(_ctx: Context) {
+  async GET(_ctx: Context<unknown>) {
     try {
       const stripe = createStripeClient(requireEnv("STRIPE_SECRET_KEY"));
 
@@ -38,6 +38,7 @@ export const handler = {
             name: product.name,
             image: product.images[0] ?? null,
             imageUrl: product.metadata.image_url ?? null,
+            photoDate: product.metadata.photo_date ?? null,
             prices: prices.data.map((p) => ({
               id: p.id,
               unitAmount: p.unit_amount,
@@ -49,6 +50,15 @@ export const handler = {
         }),
       );
 
+      results.sort((a, b) => {
+        const da = a.photoDate ?? "";
+        const db = b.photoDate ?? "";
+        if (da && db) return db.localeCompare(da);
+        if (da) return -1;
+        if (db) return 1;
+        return 0;
+      });
+
       return jsonResponse(results);
     } catch (err) {
       console.error("list-products error:", err);
@@ -57,7 +67,7 @@ export const handler = {
     }
   },
 
-  async DELETE(ctx: Context) {
+  async DELETE(ctx: Context<unknown>) {
     try {
       const url = new URL(ctx.req.url);
       const productId = url.searchParams.get("id");
@@ -109,13 +119,14 @@ export const handler = {
     }
   },
 
-  async PATCH(ctx: Context) {
+  async PATCH(ctx: Context<unknown>) {
     try {
       const body = await ctx.req.json() as {
         productId: string;
         product?: {
           name?: string;
           imageUrl?: string;
+          photoDate?: string;
         };
         metadataUpdates?: {
           priceId: string;
@@ -138,10 +149,17 @@ export const handler = {
 
       if (body.product) {
         const updateFields: Record<string, unknown> = {};
+        const metadataUpdates: Record<string, string> = {};
         if (body.product.name) updateFields.name = body.product.name;
         if (body.product.imageUrl !== undefined) {
           updateFields.images = body.product.imageUrl ? [body.product.imageUrl] : [];
-          updateFields.metadata = { image_url: body.product.imageUrl };
+          metadataUpdates.image_url = body.product.imageUrl;
+        }
+        if (body.product.photoDate !== undefined) {
+          metadataUpdates.photo_date = body.product.photoDate;
+        }
+        if (Object.keys(metadataUpdates).length) {
+          updateFields.metadata = metadataUpdates;
         }
         if (Object.keys(updateFields).length) {
           await stripe.products.update(body.productId, updateFields);

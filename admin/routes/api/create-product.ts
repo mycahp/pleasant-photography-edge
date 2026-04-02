@@ -11,12 +11,13 @@ function requireEnv(name: string): string {
 }
 
 export const handler = {
-  async POST(ctx: Context) {
+  async POST(ctx: Context<unknown>) {
     try {
       const formData = await ctx.req.formData();
       const name = formData.get("name") as string;
       const file = formData.get("file") as File;
       const variantsJson = formData.get("variants") as string | null;
+      const photoDate = formData.get("photoDate") as string | null;
 
       if (!name || !file || file.size === 0) {
         return new Response(
@@ -52,10 +53,13 @@ export const handler = {
       const fileData = new Uint8Array(await file.arrayBuffer());
       const cdnUrl = await uploadToBunny(fileData, file.name, bunnyConfig);
 
+      const metadata: Record<string, string> = { image_url: cdnUrl };
+      if (photoDate) metadata.photo_date = photoDate;
+
       const product = await stripe.products.create({
         name,
         images: [cdnUrl],
-        metadata: { image_url: cdnUrl },
+        metadata,
       });
 
       const priceIds: string[] = [];

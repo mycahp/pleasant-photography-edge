@@ -11,7 +11,8 @@ export async function uploadToBunny(
   config: BunnyConfig,
 ): Promise<string> {
   const region = config.storageRegion || "storage.bunnycdn.com";
-  const url = `https://${region}/${config.storageZone}/${fileName}`;
+  const path = `pleasant-photography-storefront/${fileName}`;
+  const url = `https://${region}/${config.storageZone}/${path}`;
 
   const res = await fetch(url, {
     method: "PUT",
@@ -27,7 +28,7 @@ export async function uploadToBunny(
     throw new Error(`Bunny upload failed (${res.status}): ${body}`);
   }
 
-  return `https://${config.cdnHostname}/${fileName}`;
+  return `https://${config.cdnHostname}/${path}`;
 }
 
 export async function deleteFromBunny(

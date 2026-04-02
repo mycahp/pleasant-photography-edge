@@ -24,6 +24,7 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
   const result = useSignal<Result | null>(null);
   const variants = useSignal<VariantInput[]>([]);
   const variantsLoading = useSignal(true);
+  const photoDate = useSignal(new Date().toISOString().split("T")[0]);
 
   useEffect(() => {
     fetch("/api/variants")
@@ -95,6 +96,7 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
       data.append("name", name);
       data.append("file", file);
       data.append("variants", JSON.stringify(valid));
+      data.append("photoDate", photoDate.value);
 
       const res = await fetch("/api/create-product", {
         method: "POST",
@@ -122,6 +124,15 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
     <form onSubmit={handleSubmit}>
       <label for="name">Product Name</label>
       <input type="text" id="name" name="name" placeholder="Sunset at Big Sur" required />
+
+      <label for="photoDate">Date of Photo</label>
+      <input
+        type="date"
+        id="photoDate"
+        name="photoDate"
+        value={photoDate.value}
+        onInput={(e) => { photoDate.value = (e.target as HTMLInputElement).value; }}
+      />
 
       <label for="file">Photo File</label>
       <input type="file" id="file" name="file" accept="image/*" required />

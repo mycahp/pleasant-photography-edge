@@ -1,5 +1,5 @@
 [
-  { "printSize": "8x10", "defaultPriceInCents": 2500, "gelatoProductUid": "poster_8x10_TODO" },
-  { "printSize": "12x18", "defaultPriceInCents": 4500, "gelatoProductUid": "poster_12x18_TODO" },
-  { "printSize": "16x24", "defaultPriceInCents": 6500, "gelatoProductUid": "poster_16x24_TODO" }
+  { "printSize": "8x12", "defaultPriceInCents": 2500, "gelatoProductUid": "fine_arts_poster_geo_simplified_product_12-0_ver_a4-8x12-inch_200-gsm-80lb-enhanced-uncoated" },
+  { "printSize": "12x18", "defaultPriceInCents": 3000, "gelatoProductUid": "fine_arts_poster_geo_simplified_product_12-0_ver_300x450-mm-12x18-inch_200-gsm-80lb-enhanced-uncoated" },
+  { "printSize": "16x24", "defaultPriceInCents": 3500, "gelatoProductUid": "fine_arts_poster_geo_simplified_product_12-0_ver_400x600-mm-16x24-inch_200-gsm-80lb-enhanced-uncoated" }
 ]

@@ -14,6 +14,7 @@ interface Product {
   name: string;
   image: string | null;
   imageUrl: string | null;
+  photoDate: string | null;
   prices: Price[];
 }
 
@@ -48,6 +49,7 @@ interface EditState {
   productId: string;
   name: string;
   imageUrl: string;
+  photoDate: string;
   prices: EditPrice[];
 }
 
@@ -96,6 +98,7 @@ export default function ProductList({ refreshKey }: { refreshKey?: number }) {
       productId: product.id,
       name: product.name,
       imageUrl: product.imageUrl ?? "",
+      photoDate: product.photoDate ?? "",
       prices: product.prices.map((p) => ({
         kind: "existing" as const,
         priceId: p.id,
@@ -112,7 +115,7 @@ export default function ProductList({ refreshKey }: { refreshKey?: number }) {
     editing.value = null;
   }
 
-  function updateEditProduct(field: "name" | "imageUrl", value: string) {
+  function updateEditProduct(field: "name" | "imageUrl" | "photoDate", value: string) {
     if (!editing.value) return;
     editing.value = { ...editing.value, [field]: value };
   }
@@ -207,6 +210,7 @@ export default function ProductList({ refreshKey }: { refreshKey?: number }) {
       const productMeta: Record<string, string> = {};
       if (editing.value.name !== product.name) productMeta.name = editing.value.name;
       if (editing.value.imageUrl !== (product.imageUrl ?? "")) productMeta.imageUrl = editing.value.imageUrl;
+      if (editing.value.photoDate !== (product.photoDate ?? "")) productMeta.photoDate = editing.value.photoDate;
 
       const res = await fetch(`/api/products?id=${product.id}`, {
         method: "PATCH",
@@ -274,6 +278,14 @@ export default function ProductList({ refreshKey }: { refreshKey?: number }) {
                       type="text"
                       value={editing.value!.name}
                       onInput={(e) => updateEditProduct("name", (e.target as HTMLInputElement).value)}
+                    />
+                  </div>
+                  <div class="edit-field">
+                    <label>Date of Photo</label>
+                    <input
+                      type="date"
+                      value={editing.value!.photoDate}
+                      onInput={(e) => updateEditProduct("photoDate", (e.target as HTMLInputElement).value)}
                     />
                   </div>
                   <div class="edit-field">
@@ -375,6 +387,9 @@ export default function ProductList({ refreshKey }: { refreshKey?: number }) {
               ) : (
                 <>
                   <h3 class="product-name">{product.name}</h3>
+                  {product.photoDate && (
+                    <p class="product-date">{product.photoDate}</p>
+                  )}
                   <div class="product-prices">
                     {product.prices.map((price) => (
                       <span key={price.id} class="price-tag">
