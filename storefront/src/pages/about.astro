@@ -1,0 +1,119 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="about — mycah pleasant photography" activePage="about">
+
+	<style>
+		#about-wrapper {
+			padding-top: 44px;
+		}
+		#about-header {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 0.25rem;
+			padding: 2.5rem 2rem;
+			background: #18181b;
+			margin-bottom: 0.125rem;
+		}
+		@media (min-width: 768px) {
+			#about-header {
+				display: none;
+			}
+		}
+		#about-layout {
+			display: grid;
+			grid-template-columns: 1fr;
+		}
+		@media (min-width: 768px) {
+			#about-layout {
+				grid-template-columns: 3fr 2fr;
+				height: calc(100vh - 44px);
+			}
+		}
+		#about-image img {
+			width: 100%;
+			height: 55vw;
+			object-fit: cover;
+			object-position: top;
+			display: block;
+		}
+		@media (min-width: 768px) {
+			#about-image img {
+				height: 100%;
+			}
+		}
+		#about-bio {
+			background: #18181b;
+			border-top: 1px solid #27272a;
+			display: flex;
+			align-items: center;
+		}
+		@media (min-width: 768px) {
+			#about-bio {
+				border-top: none;
+				border-left: 1px solid #27272a;
+			}
+		}
+		#about-bio-inner {
+			padding: 2.5rem 1.75rem;
+			max-width: 340px;
+		}
+		@media (min-width: 768px) {
+			#about-bio-inner {
+				padding: 4rem 3rem;
+			}
+		}
+		#about-bio-inner p {
+			font-size: 0.8125rem;
+			line-height: 1.75;
+			color: #d4d4d8;
+			margin-bottom: 1.5rem;
+		}
+		#about-bio-inner p:last-child {
+			margin-bottom: 0;
+		}
+	</style>
+
+	<div id="about-wrapper">
+
+	<!-- Mobile brand header — mirrors the homepage header cell -->
+	<div id="about-header">
+		<span style="font-size: 1.875rem; line-height: 1; letter-spacing: -0.025em; white-space: nowrap;">mycah pleasant</span>
+		<span style="font-size: 1.5rem; letter-spacing: 0.1em; color: #3b82f6; white-space: nowrap;">photography</span>
+	</div>
+
+	<div id="about-layout">
+
+		<div id="about-image">
+			<img
+				src="https://cdn.pleasant.photography/storefront/mpp_about.jpg"
+				alt="mycah pleasant"
+			/>
+		</div>
+
+		<div id="about-bio">
+			<div id="about-bio-inner">
+				<p>
+					I'm a photographer based in North Georgia who loves to wander — both around town and
+					across the country with my camera in tow.
+				</p>
+				<p>
+					I got my start in photojournalism, which taught me to look for the whole story, not just
+					the pretty shot. These days, I'm usually out chasing wildlife or capturing street life,
+					but I'm always up for portrait sessions, events, and commercial work too.
+				</p>
+				<p>
+					Whether it's a hawk mid-flight, a candid moment at your wedding, or headshots for your
+					business, I just try to capture things as they really are.
+				</p>
+			</div>
+		</div>
+
+	</div>
+
+	</div>
+
+</Base>

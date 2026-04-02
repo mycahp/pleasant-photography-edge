@@ -80,19 +80,6 @@ import Base from '../layouts/Base.astro';
 			return `$${(cents / 100).toFixed(2)}`;
 		}
 
-		// ---- Nav scroll observer ----
-
-		const headerCell = document.getElementById('header-cell')!;
-		const navBrand = document.getElementById('nav-brand')!;
-		const topNav = document.getElementById('top-nav')!;
-
-		new IntersectionObserver(([entry]) => {
-			const gone = !entry.isIntersecting;
-			navBrand.style.opacity = gone ? '1' : '0';
-			navBrand.style.pointerEvents = gone ? 'auto' : 'none';
-			topNav.style.backgroundColor = gone ? 'rgba(24, 24, 27, 0.75)' : '';
-		}, { threshold: 0 }).observe(headerCell);
-
 		// ---- Product modal ----
 
 		let currentProduct: Product | null = null;

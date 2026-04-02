@@ -63,6 +63,13 @@ const {
 				width: 100%;
 			}
 
+			/* Hide brand in nav on mobile — links don't have room */
+			@media (max-width: 767px) {
+				#nav-brand {
+					display: none !important;
+				}
+			}
+
 			#cart-drawer {
 				transition: transform 0.25s ease;
 			}
@@ -73,14 +80,14 @@ const {
 	</head>
 	<body class="bg-zinc-950 text-zinc-50">
 
-		<nav id="top-nav" class="fixed top-0 inset-x-0 z-50 bg-zinc-900 border-t-2 border-blue-500 backdrop-blur-sm" style="transition: background-color 0.2s ease;">
-			<div class="relative flex items-center justify-center md:justify-end px-6 py-3">
+		<nav id="top-nav" data-page={activePage} class="fixed top-0 inset-x-0 z-50 bg-zinc-900 border-t-2 border-blue-500 backdrop-blur-sm" style="transition: background-color 0.2s ease;">
+			<div class="relative flex items-center justify-end px-6 py-3">
 				<a href="/" class="absolute left-6 text-sm opacity-0 transition-opacity duration-200 pointer-events-none whitespace-nowrap" id="nav-brand">mycah pleasant <span class="text-blue-500">photography</span></a>
-				<div class="flex items-center gap-6">
-					<a href="/" class={`nav-link text-sm ${activePage === 'home' ? 'active' : ''}`}>home</a>
-					<a href="/about" class={`nav-link text-sm ${activePage === 'about' ? 'active' : ''}`}>about</a>
-					<a href="#" class={`nav-link text-sm ${activePage === 'contact' ? 'active' : ''}`}>contact and bookings</a>
-					<button id="cart-btn" class="nav-link text-sm relative" aria-label="open cart">
+				<div style="display: flex; align-items: center; gap: 1.25rem;">
+					<a href="/" class={`nav-link text-sm ${activePage === 'home' ? 'active' : ''}`} style="white-space: nowrap;">home</a>
+					<a href="/about" class={`nav-link text-sm ${activePage === 'about' ? 'active' : ''}`} style="white-space: nowrap;">about</a>
+					<a href="#" class={`nav-link text-sm ${activePage === 'contact' ? 'active' : ''}`} style="white-space: nowrap;">contact<span class="hidden md:inline"> and bookings</span></a>
+					<button id="cart-btn" class="nav-link text-sm relative" style="white-space: nowrap;" aria-label="open cart">
 						cart
 						<span id="cart-badge" class="hidden absolute -top-2 -right-3 bg-blue-500 text-white text-[10px] w-4 h-4 rounded-full items-center justify-center leading-none">0</span>
 					</button>
@@ -89,6 +96,16 @@ const {
 		</nav>
 
 		<slot />
+
+		<footer class="border-t border-zinc-800 bg-zinc-900">
+			<div class="px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+				<span>© {new Date().getFullYear()} mycah pleasant <span class="text-blue-500">photography</span>. all rights reserved.</span>
+				<div class="flex items-center gap-6">
+					<a href="/about" class="hover:text-zinc-300 transition-colors">about</a>
+					<a href="#" class="hover:text-zinc-300 transition-colors">contact and bookings</a>
+				</div>
+			</div>
+		</footer>
 
 		<!-- Cart backdrop -->
 		<div id="cart-backdrop" class="fixed inset-0 z-[290] hidden" style="background: rgba(9,9,11,0.5);" aria-hidden="true"></div>
@@ -137,6 +154,31 @@ const {
 
 			function formatPrice(cents: number): string {
 				return `$${(cents / 100).toFixed(2)}`;
+			}
+
+			// ---- Nav brand ----
+
+			const topNav = document.getElementById('top-nav')!;
+			const navBrand = document.getElementById('nav-brand')!;
+			const isHome = topNav.dataset.page === 'home';
+
+			function setNavScrolled(scrolled: boolean): void {
+				navBrand.style.opacity = scrolled ? '1' : '0';
+				navBrand.style.pointerEvents = scrolled ? 'auto' : 'none';
+				topNav.style.backgroundColor = scrolled ? 'rgba(24, 24, 27, 0.75)' : '';
+			}
+
+			if (!isHome) {
+				// Always visible on non-home pages
+				setNavScrolled(true);
+			} else {
+				// On homepage, show when the header cell scrolls out of view
+				const headerCell = document.getElementById('header-cell');
+				if (headerCell) {
+					new IntersectionObserver(([entry]) => {
+						setNavScrolled(!entry.isIntersecting);
+					}, { threshold: 0 }).observe(headerCell);
+				}
 			}
 
 			// ---- Cart badge ----
