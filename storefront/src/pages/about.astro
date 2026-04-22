@@ -59,7 +59,6 @@ import Base from '../layouts/Base.astro';
 		}
 		#about-bio-inner {
 			padding: 2.5rem 1.75rem;
-			max-width: 340px;
 		}
 		@media (min-width: 768px) {
 			#about-bio-inner {
@@ -71,6 +70,11 @@ import Base from '../layouts/Base.astro';
 			line-height: 1.75;
 			color: #d4d4d8;
 			margin-bottom: 1.5rem;
+		}
+		@media (min-width: 768px) {
+			#about-bio-inner p {
+				font-size: 1.125rem;
+			}
 		}
 		#about-bio-inner p:last-child {
 			margin-bottom: 0;

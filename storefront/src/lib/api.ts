@@ -10,4 +10,5 @@ export const api = {
   checkout: `${base}/checkout`,
   checkoutStatus: (sessionId: string) =>
     `${base}/checkout/status?session_id=${sessionId}`,
+  contact: `${base}/contact`,
 } as const;

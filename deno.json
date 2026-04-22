@@ -1,6 +1,8 @@
 {
   "tasks": {
     "bundle:storefront-api": "deno run -A npm:esbuild scripts/storefront-api/main.ts --bundle --format=esm --platform=browser --external:@bunny.net/edgescript-sdk \"--external:node:*\" --outfile=dist/storefront-api.js",
+    "deploy:test": "deno task deploy:storefront-api:test && deno task deploy:storefront:test",
+    "deploy:prod": "deno task deploy:storefront-api:prod && deno task deploy:storefront:prod",
     "deploy:storefront-api:test": "deno run -A npm:esbuild scripts/storefront-api/main.ts --bundle --format=esm --platform=browser --external:@bunny.net/edgescript-sdk \"--external:node:*\" --outfile=dist/storefront-api.js && deno run --allow-net --allow-read --allow-env --env-file=.env scripts/storefront-api/deploy.ts",
     "deploy:storefront-api:prod": "deno run -A npm:esbuild scripts/storefront-api/main.ts --bundle --format=esm --platform=browser --external:@bunny.net/edgescript-sdk \"--external:node:*\" --outfile=dist/storefront-api.js && deno run --allow-net --allow-read --allow-env --env-file=.env.prod scripts/storefront-api/deploy.ts",
     "build:storefront:test": "cd storefront && npx astro build --mode staging",

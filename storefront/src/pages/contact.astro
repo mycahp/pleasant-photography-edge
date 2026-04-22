@@ -1,0 +1,252 @@
+---
+import Base from '../layouts/Base.astro';
+const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+<Base title="contact — mycah pleasant photography" activePage="contact">
+
+	<style>
+		#contact-wrapper {
+			padding-top: 44px;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+		#contact-layout {
+			display: grid;
+			grid-template-columns: 1fr;
+			flex: 1;
+		}
+		@media (min-width: 768px) {
+			#contact-layout {
+				grid-template-columns: 2fr 3fr;
+			}
+		}
+		#contact-intro {
+			background: #18181b;
+			border-bottom: 1px solid #27272a;
+			display: flex;
+			align-items: center;
+			padding: 2.5rem 1.75rem;
+		}
+		@media (min-width: 768px) {
+			#contact-intro {
+				border-bottom: none;
+				border-right: 1px solid #27272a;
+				padding: 4rem 3rem;
+				position: sticky;
+				top: 44px;
+				height: calc(100vh - 44px);
+			}
+		}
+		#contact-intro-inner h1 {
+			font-size: 1.5rem;
+			letter-spacing: -0.025em;
+			margin-bottom: 1rem;
+			line-height: 1.2;
+		}
+		@media (min-width: 768px) {
+			#contact-intro-inner h1 {
+				font-size: 2rem;
+			}
+		}
+		#contact-intro-inner p {
+			font-size: 0.8125rem;
+			line-height: 1.75;
+			color: #d4d4d8;
+		}
+		@media (min-width: 768px) {
+			#contact-intro-inner p {
+				font-size: 1.125rem;
+			}
+		}
+		#contact-form-section {
+			padding: 2.5rem 1.75rem;
+		}
+		@media (min-width: 768px) {
+			#contact-form-section {
+				padding: 4rem 3rem;
+			}
+		}
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+		.form-label {
+			display: block;
+			font-size: 0.6875rem;
+			letter-spacing: 0.08em;
+			color: #71717a;
+			margin-bottom: 0.5rem;
+		}
+		.form-input {
+			width: 100%;
+			background: #18181b;
+			border: 1px solid #27272a;
+			color: #fafafa;
+			padding: 0.625rem 0.75rem;
+			font-size: 0.8125rem;
+			font-family: inherit;
+			outline: none;
+			transition: border-color 0.15s ease;
+			box-sizing: border-box;
+		}
+		.form-input:focus {
+			border-color: #3b82f6;
+		}
+		.form-input::placeholder {
+			color: #52525b;
+		}
+		textarea.form-input {
+			resize: vertical;
+			min-height: 140px;
+		}
+		#submit-btn {
+			background: #3b82f6;
+			color: white;
+			border: none;
+			padding: 0.625rem 1.5rem;
+			font-size: 0.8125rem;
+			font-family: inherit;
+			cursor: pointer;
+			letter-spacing: 0.05em;
+			transition: background-color 0.15s ease;
+			width: 100%;
+		}
+		#submit-btn:hover:not(:disabled) {
+			background: #60a5fa;
+		}
+		#submit-btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		#form-status {
+			margin-top: 1rem;
+			font-size: 0.8125rem;
+			display: none;
+		}
+		#form-status.success {
+			color: #4ade80;
+		}
+		#form-status.error {
+			color: #f87171;
+		}
+		#turnstile-container {
+			margin-bottom: 1.5rem;
+		}
+	</style>
+
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+	<div id="contact-wrapper">
+		<div id="contact-layout">
+
+			<div id="contact-intro">
+				<div id="contact-intro-inner">
+					<h1>contact<br /><span style="color: #3b82f6;">and bookings</span></h1>
+					<p>
+						Available for portrait sessions, events, and commercial work in the North Georgia area and beyond.
+					</p>
+				</div>
+			</div>
+
+			<div id="contact-form-section">
+				<form id="contact-form" novalidate>
+
+					<!-- Honeypot — hidden from real users, bots fill it in -->
+					<input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+					<div class="form-group">
+						<label class="form-label" for="name">name</label>
+						<input class="form-input" type="text" id="name" name="name" placeholder="your name" autocomplete="name" required />
+					</div>
+
+					<div class="form-group">
+						<label class="form-label" for="email">email</label>
+						<input class="form-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" required />
+					</div>
+
+					<div class="form-group">
+						<label class="form-label" for="message">message</label>
+						<textarea class="form-input" id="message" name="message" placeholder="tell me about your project..." required></textarea>
+					</div>
+
+					<div id="turnstile-container">
+						<div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="dark"></div>
+					</div>
+
+					<button type="submit" id="submit-btn">send message</button>
+
+					<p id="form-status"></p>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+		import { api } from '../lib/api';
+
+		const form = document.getElementById('contact-form') as HTMLFormElement;
+		const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+		const statusEl = document.getElementById('form-status') as HTMLParagraphElement;
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			const data = new FormData(form);
+			const name = (data.get('name') as string).trim();
+			const email = (data.get('email') as string).trim();
+			const message = (data.get('message') as string).trim();
+			const website = data.get('website') as string; // honeypot
+
+			// @ts-ignore — Turnstile adds this to window
+			const turnstileToken = (window.turnstile?.getResponse() as string | undefined) ?? '';
+
+			if (!name || !email || !message) {
+				statusEl.textContent = 'please fill in all fields.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+				return;
+			}
+
+			if (!turnstileToken) {
+				statusEl.textContent = 'please complete the CAPTCHA.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+				return;
+			}
+
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'sending...';
+			statusEl.style.display = 'none';
+
+			try {
+				const res = await fetch(api.contact, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ name, email, message, website, turnstileToken }),
+				});
+
+				if (!res.ok) {
+					const err = await res.json() as { error?: string };
+					throw new Error(err.error ?? `Error ${res.status}`);
+				}
+
+				form.reset();
+				// @ts-ignore
+				window.turnstile?.reset();
+				statusEl.textContent = 'message sent — i\'ll be in touch soon.';
+				statusEl.className = 'success';
+				statusEl.style.display = 'block';
+			} catch (err) {
+				statusEl.textContent = err instanceof Error ? err.message : 'something went wrong, please try again.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+			} finally {
+				submitBtn.disabled = false;
+				submitBtn.textContent = 'send message';
+			}
+		});
+	</script>
+
+</Base>

@@ -393,6 +393,69 @@ BunnySDK.net.http.serve(async (request: Request): Promise<Response> => {
         return json({ clientSecret: session.client_secret }, 200, origin);
       }
 
+      if (url.pathname === "/contact") {
+        const body = await request.json() as {
+          name?: string;
+          email?: string;
+          message?: string;
+          turnstileToken?: string;
+          website?: string;
+        };
+
+        // Honeypot — silently succeed for bots
+        if (body.website) {
+          return json({ success: true }, 200, origin);
+        }
+
+        const { name, email, message, turnstileToken } = body;
+        if (!name?.trim() || !email?.trim() || !message?.trim() || !turnstileToken) {
+          return json({ error: "Missing required fields" }, 400, origin);
+        }
+
+        const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+        if (!turnstileSecret) throw new Error("TURNSTILE_SECRET_KEY is not set");
+
+        const tvRes = await fetch(
+          "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ secret: turnstileSecret, response: turnstileToken }),
+          },
+        );
+        const tvData = await tvRes.json() as { success: boolean };
+        if (!tvData.success) {
+          return json({ error: "CAPTCHA verification failed" }, 400, origin);
+        }
+
+        const resendKey = process.env.RESEND_API_KEY;
+        const resendFrom = process.env.RESEND_FROM ?? "onboarding@resend.dev";
+        const contactEmail = process.env.CONTACT_EMAIL;
+        if (!resendKey || !contactEmail) throw new Error("RESEND_API_KEY or CONTACT_EMAIL is not set");
+
+        const emailRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: resendFrom,
+            to: contactEmail,
+            reply_to: email,
+            subject: `Contact from ${name}`,
+            text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+          }),
+        });
+
+        if (!emailRes.ok) {
+          const text = await emailRes.text();
+          throw new Error(`Email send failed (${emailRes.status}): ${text}`);
+        }
+
+        return json({ success: true }, 200, origin);
+      }
+
       if (url.pathname === "/webhook") {
         const sigHeader = request.headers.get("Stripe-Signature");
         if (!sigHeader) {
