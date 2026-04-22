@@ -24,6 +24,8 @@ function requireEnv(name: string): string {
 const storageZone = requireEnv("BUNNY_SITE_STORAGE_ZONE");
 const apiKey = requireEnv("BUNNY_SITE_STORAGE_API_KEY");
 const region = Deno.env.get("BUNNY_SITE_STORAGE_REGION") || "storage.bunnycdn.com";
+const pullZoneId = requireEnv("BUNNY_SITE_PULL_ZONE_ID");
+const bunnyApiKey = requireEnv("BUNNY_API_KEY");
 
 const CONTENT_TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -90,3 +92,14 @@ for await (const entry of walk(distDir, { includeDirs: false })) {
 
 console.log(`\n${uploaded} uploaded, ${failed} failed.`);
 if (failed > 0) Deno.exit(1);
+
+console.log("Purging CDN cache...");
+const purgeRes = await fetch(
+  `https://api.bunny.net/pullzone/${pullZoneId}/purgeCache`,
+  { method: "POST", headers: { AccessKey: bunnyApiKey } },
+);
+if (!purgeRes.ok) {
+  console.error(`Cache purge failed (${purgeRes.status}): ${await purgeRes.text()}`);
+  Deno.exit(1);
+}
+console.log("Done.");
