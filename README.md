@@ -86,9 +86,41 @@ deno run \
 
 Variant sizes and prices come from `shared/variants.json`.
 
-### `get-stripe-cart`
+### `storefront-api` (Bunny EdgeScript)
 
-Coming soon — edge script for cart management.
+A Bunny EdgeScript that runs on the CDN edge, providing the product catalog and
+Stripe embedded checkout API for the storefront.
+
+| Method | Path               | Description                                      |
+| ------ | ------------------ | ------------------------------------------------ |
+| GET    | `/products`        | List all active products with prices             |
+| GET    | `/products/:id`    | Get a single product with prices                 |
+| POST   | `/checkout`        | Create a Stripe embedded checkout session        |
+| GET    | `/checkout/status` | Get checkout session status (`?session_id=…`)    |
+| POST   | `/webhook`         | Stripe webhook — triggers Gelato fulfillment     |
+
+#### Deploying
+
+```bash
+deno task deploy:storefront-api
+```
+
+This bundles `scripts/storefront-api/main.ts` to `dist/storefront-api.js` using
+esbuild (marking the Bunny SDK as external since it's provided by the runtime),
+then uploads it to Bunny via the EdgeScript API.
+
+Requires `BUNNY_API_KEY` and `BUNNY_EDGE_SCRIPT_ID` in `.env`. Find the script
+ID in the Bunny dashboard under **Edge Scripting → your script → Settings**.
+
+To bundle without deploying:
+
+```bash
+deno task bundle:storefront-api
+```
+
+Environment variables for the script itself (`STRIPE_SECRET_KEY`,
+`STRIPE_WEBHOOK_SECRET`, `GELATO_API_KEY`, etc.) must be configured in the
+Bunny dashboard under **Edge Scripting → your script → Environment Variables**.
 
 ---
 
@@ -121,7 +153,34 @@ Prices are in cents (Stripe convention). Gelato Product UIDs should be replaced 
 
 ## Storefront (`storefront/`)
 
-Coming soon — customer-facing storefront for browsing and purchasing prints. Will consume products from Stripe and serve images from Bunny CDN.
+Customer-facing Astro site for browsing and purchasing prints. Consumes products
+from the `storefront-api` edge script and images from Bunny CDN.
+
+### Running Locally
+
+```bash
+cd storefront
+npm install
+npm run dev
+```
+
+### Building & Deploying
+
+```bash
+deno task deploy:storefront
+```
+
+This runs `astro build` (outputting to `storefront/dist/`), then uploads every
+file in that directory to the root of your Bunny Storage zone. Your Bunny Pull
+Zone should point at that storage zone to serve the site.
+
+To build without deploying:
+
+```bash
+deno task build:storefront
+```
+
+Before deploying, update `storefront/astro.config.mjs` with your actual domain.
 
 ---
 
@@ -137,13 +196,18 @@ BUNNY_CDN_HOSTNAME=cdn.yourdomain.com
 BUNNY_STORAGE_REGION=ny.storage.bunnycdn.com
 ```
 
-| Variable              | Description                                             |
-| --------------------- | ------------------------------------------------------- |
-| `STRIPE_SECRET_KEY`   | Stripe secret API key                                   |
-| `BUNNY_STORAGE_ZONE`  | Bunny Storage zone name (also the FTP username)         |
-| `BUNNY_STORAGE_API_KEY` | Bunny Storage API key (FTP password)                  |
-| `BUNNY_CDN_HOSTNAME`  | Hostname of the Bunny Pull Zone (e.g. `cdn.example.com`) |
-| `BUNNY_STORAGE_REGION` | Storage API endpoint region (e.g. `ny.storage.bunnycdn.com`) |
+| Variable                | Description                                                          |
+| ----------------------- | -------------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`     | Stripe secret API key                                                |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (for the `/webhook` edge route)        |
+| `BUNNY_STORAGE_ZONE`    | Bunny Storage zone name (also the FTP username)                      |
+| `BUNNY_STORAGE_API_KEY` | Bunny Storage API key (FTP password)                                 |
+| `BUNNY_CDN_HOSTNAME`    | Hostname of the Bunny Pull Zone (e.g. `cdn.example.com`)             |
+| `BUNNY_STORAGE_REGION`  | Storage API endpoint region (e.g. `ny.storage.bunnycdn.com`)         |
+| `BUNNY_API_KEY`         | Bunny account-level API key — used only for deploying the edge script |
+| `BUNNY_EDGE_SCRIPT_ID`  | Numeric ID of the EdgeScript in the Bunny dashboard                  |
+| `GELATO_API_KEY`        | Gelato API key for print fulfillment orders                          |
+| `GELATO_TEST_MODE`      | Set to `true` to create Gelato draft orders instead of live orders   |
 
 ---
 
