@@ -25,6 +25,7 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
   const variants = useSignal<VariantInput[]>([]);
   const variantsLoading = useSignal(true);
   const photoDate = useSignal(new Date().toISOString().split("T")[0]);
+  const description = useSignal("200 gsm fine art print. 12-color precision, matte finish, FSC-certified paper.");
 
   useEffect(() => {
     fetch("/api/variants")
@@ -97,6 +98,7 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
       data.append("file", file);
       data.append("variants", JSON.stringify(valid));
       data.append("photoDate", photoDate.value);
+      data.append("description", description.value);
 
       const res = await fetch("/api/create-product", {
         method: "POST",
@@ -132,6 +134,15 @@ export default function UploadForm({ onCreated }: { onCreated?: () => void }) {
         name="photoDate"
         value={photoDate.value}
         onInput={(e) => { photoDate.value = (e.target as HTMLInputElement).value; }}
+      />
+
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        name="description"
+        rows={3}
+        value={description.value}
+        onInput={(e) => { description.value = (e.target as HTMLTextAreaElement).value; }}
       />
 
       <label for="file">Photo File</label>

@@ -40,6 +40,7 @@ import Base from '../layouts/Base.astro';
 					<p class="text-xs text-zinc-500 uppercase tracking-widest mb-2">print size</p>
 					<div id="modal-sizes" class="flex flex-wrap gap-2"></div>
 				</div>
+				<p id="modal-description" class="text-xs text-zinc-400 leading-relaxed"></p>
 				<div class="flex items-baseline gap-2">
 					<span id="modal-price" class="text-blue-500 text-lg"></span>
 					<span class="text-xs text-zinc-500">usd</span>
@@ -86,6 +87,7 @@ import Base from '../layouts/Base.astro';
 		const modalProductDate = document.getElementById('modal-product-date')!;
 		const modalSizes = document.getElementById('modal-sizes')!;
 		const modalPrice = document.getElementById('modal-price')!;
+		const modalDescription = document.getElementById('modal-description')!;
 		const modalAddToCartBtn = document.getElementById('modal-add-to-cart') as HTMLButtonElement;
 		const modalClose = document.getElementById('modal-close')!;
 		const modalImageArea = document.getElementById('modal-image-area')!;
@@ -97,6 +99,7 @@ import Base from '../layouts/Base.astro';
 			modalImg.alt = product.name;
 			modalProductName.textContent = product.name;
 			modalProductDate.textContent = product.photoDate ?? '';
+			modalDescription.textContent = product.description ?? '';
 
 			const prices = [...product.prices].sort((a, b) => a.unitAmount - b.unitAmount);
 			selectedPriceId = prices[0]?.id ?? null;

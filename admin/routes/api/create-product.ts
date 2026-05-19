@@ -18,6 +18,7 @@ export const handler = {
       const file = formData.get("file") as File;
       const variantsJson = formData.get("variants") as string | null;
       const photoDate = formData.get("photoDate") as string | null;
+      const description = formData.get("description") as string | null;
 
       if (!name || !file || file.size === 0) {
         return new Response(
@@ -61,6 +62,7 @@ export const handler = {
 
       const product = await stripe.products.create({
         name,
+        description: description || undefined,
         images: [cdnUrl],
         metadata,
       });

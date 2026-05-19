@@ -116,6 +116,7 @@ async function getProduct(productId) {
   };
 }
 async function createCheckoutSession(items, returnUrl) {
+  const shippingRateId = process.env.STRIPE_SHIPPING_RATE_ID;
   const params = new URLSearchParams();
   params.set("mode", "payment");
   params.set("ui_mode", "embedded");
@@ -124,6 +125,17 @@ async function createCheckoutSession(items, returnUrl) {
     params.set(`line_items[${i}][price]`, items[i].priceId);
     params.set(`line_items[${i}][quantity]`, String(items[i].quantity));
   }
+  if (shippingRateId) {
+    params.set("shipping_options[0][shipping_rate]", shippingRateId);
+    params.set("shipping_address_collection[allowed_countries][0]", "US");
+    params.set("shipping_address_collection[allowed_countries][1]", "CA");
+    params.set("shipping_address_collection[allowed_countries][2]", "GB");
+    params.set("shipping_address_collection[allowed_countries][3]", "AU");
+    params.set("shipping_address_collection[allowed_countries][4]", "DE");
+    params.set("shipping_address_collection[allowed_countries][5]", "FR");
+    params.set("shipping_address_collection[allowed_countries][6]", "JP");
+  }
+  params.set("automatic_tax[enabled]", "true");
   return await stripePost(
     "/checkout/sessions",
     params
@@ -184,7 +196,9 @@ async function createGelatoOrder(session, lineItems) {
       ]
     };
   });
-  const addr = session.customer_details.address;
+  const shipping = session.shipping_details ?? { name: session.customer_details.name, address: session.customer_details.address };
+  const addr = shipping.address;
+  const nameParts = shipping.name.split(" ");
   const order = {
     orderType: isTest ? "draft" : "order",
     orderReferenceId: session.id,
@@ -193,8 +207,8 @@ async function createGelatoOrder(session, lineItems) {
     items,
     shipmentMethodUid: "standard",
     shippingAddress: {
-      firstName: session.customer_details.name.split(" ")[0] ?? "",
-      lastName: session.customer_details.name.split(" ").slice(1).join(" ") ?? "",
+      firstName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" ") ?? "",
       email: session.customer_details.email,
       addressLine1: addr.line1,
       addressLine2: addr.line2 ?? "",
