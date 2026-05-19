@@ -184,11 +184,21 @@ const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 	</div>
 
 	<script>
+		declare const window: Window & { umami?: { track: (event: string, data?: Record<string, unknown>) => void } };
+
 		import { api } from '../lib/api';
 
 		const form = document.getElementById('contact-form') as HTMLFormElement;
 		const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
 		const statusEl = document.getElementById('form-status') as HTMLParagraphElement;
+
+		let formStarted = false;
+		form.addEventListener('input', () => {
+			if (!formStarted) {
+				formStarted = true;
+				window.umami?.track('contact-form-start');
+			}
+		}, { once: false });
 
 		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
@@ -256,6 +266,7 @@ const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 				form.reset();
 				// @ts-ignore
 				window.turnstile?.reset();
+				window.umami?.track('contact-form-submit');
 				statusEl.textContent = 'message sent — i\'ll be in touch soon.';
 				statusEl.className = 'success';
 				statusEl.style.display = 'block';

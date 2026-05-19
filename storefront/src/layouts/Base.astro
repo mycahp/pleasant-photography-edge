@@ -22,6 +22,9 @@ const {
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+		{import.meta.env.PUBLIC_UMAMI_WEBSITE_ID && (
+			<script defer src="https://analytics.mycah.net/script.js" data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID}></script>
+		)}
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<style>
@@ -141,6 +144,8 @@ const {
 		</div>
 
 		<script>
+			declare const window: Window & { umami?: { track: (event: string, data?: Record<string, unknown>) => void } };
+
 			import { api } from '../lib/api';
 			import {
 				getCart,
@@ -154,6 +159,14 @@ const {
 
 			function formatPrice(cents: number): string {
 				return `$${(cents / 100).toFixed(2)}`;
+			}
+
+			// ---- Nav tracking ----
+
+			for (const link of document.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+				link.addEventListener('click', () => {
+					window.umami?.track('nav-click', { href: link.getAttribute('href') });
+				});
 			}
 
 			// ---- Nav brand ----
@@ -255,6 +268,8 @@ const {
 				if (!priceId) return;
 
 				if (target.classList.contains('remove-btn')) {
+					const removing = getCart().find((i) => i.priceId === priceId);
+					if (removing) window.umami?.track('remove-from-cart', { name: removing.productName, size: removing.printSize });
 					removeFromCart(priceId);
 					renderCartDrawer();
 				} else if (target.classList.contains('qty-dec')) {
@@ -292,6 +307,7 @@ const {
 					return;
 				}
 
+				window.umami?.track('checkout', { items: cart.map((i) => `${i.productName} (${i.printSize})`) });
 				checkoutBtn.textContent = 'loading...';
 				checkoutBtn.disabled = true;
 

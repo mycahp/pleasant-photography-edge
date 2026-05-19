@@ -63,7 +63,9 @@ import Base from '../layouts/Base.astro';
 			printSize: string | null;
 		}
 
-		interface Product {
+		declare const window: Window & { umami?: { track: (event: string, data?: Record<string, unknown>) => void } };
+
+	interface Product {
 			id: string;
 			name: string;
 			description: string | null;
@@ -95,6 +97,7 @@ import Base from '../layouts/Base.astro';
 
 		function openProductModal(product: Product): void {
 			currentProduct = product;
+			window.umami?.track('photo-click', { name: product.name });
 			modalImg.src = product.imageUrl!;
 			modalImg.alt = product.name;
 			modalProductName.textContent = product.name;
@@ -170,6 +173,7 @@ import Base from '../layouts/Base.astro';
 				printSize: price.printSize ?? price.id,
 				unitAmount: price.unitAmount,
 			});
+			window.umami?.track('add-to-cart', { name: currentProduct.name, size: price.printSize ?? price.id });
 
 			const original = modalAddToCartBtn.textContent;
 			modalAddToCartBtn.textContent = 'added!';
