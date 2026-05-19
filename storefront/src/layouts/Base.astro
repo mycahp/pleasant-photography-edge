@@ -160,27 +160,10 @@ const {
 
 			const topNav = document.getElementById('top-nav')!;
 			const navBrand = document.getElementById('nav-brand')!;
-			const isHome = topNav.dataset.page === 'home';
 
-			function setNavScrolled(scrolled: boolean): void {
-				navBrand.style.opacity = scrolled ? '1' : '0';
-				navBrand.style.pointerEvents = scrolled ? 'auto' : 'none';
-				topNav.style.backgroundColor = scrolled ? 'rgba(24, 24, 27, 0.75)' : '';
-			}
-
-			if (!isHome) {
-				navBrand.style.opacity = '1';
-				navBrand.style.pointerEvents = 'auto';
-				topNav.style.backgroundColor = '#18181b';
-			} else {
-				// On homepage, show when the header cell scrolls out of view
-				const headerCell = document.getElementById('header-cell');
-				if (headerCell) {
-					new IntersectionObserver(([entry]) => {
-						setNavScrolled(!entry.isIntersecting);
-					}, { threshold: 0 }).observe(headerCell);
-				}
-			}
+			navBrand.style.opacity = '1';
+			navBrand.style.pointerEvents = 'auto';
+			topNav.style.backgroundColor = '#18181b';
 
 			// ---- Cart badge ----
 

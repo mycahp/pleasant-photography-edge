@@ -99,7 +99,7 @@ async function getProducts(): Promise<unknown[]> {
         id: product.id,
         name: product.name,
         description: product.description,
-        imageUrl: product.metadata.image_url ?? product.images[0] ?? null,
+        imageUrl: product.metadata.web_url ?? product.metadata.image_url ?? product.images[0] ?? null,
         photoDate: product.metadata.photo_date ?? null,
         prices: prices.data.map((p) => ({
           id: p.id,
@@ -140,7 +140,7 @@ async function getProduct(productId: string): Promise<unknown> {
     id: product.id,
     name: product.name,
     description: product.description,
-    imageUrl: product.metadata.image_url ?? product.images[0] ?? null,
+    imageUrl: product.metadata.web_url ?? product.metadata.image_url ?? product.images[0] ?? null,
     photoDate: product.metadata.photo_date ?? null,
     prices: prices.data.map((p) => ({
       id: p.id,
@@ -266,7 +266,7 @@ async function createGelatoOrder(
 
   const items = lineItems.map((li) => {
     const product = li.price.product as unknown as StripeProduct;
-    const imageUrl = product.metadata.image_url ?? product.images[0] ?? "";
+    const imageUrl = product.metadata.print_url ?? product.metadata.image_url ?? product.images[0] ?? "";
     const gelatoProductUid = li.price.metadata.gelato_product_uid ?? "";
 
     return {
@@ -410,6 +410,9 @@ BunnySDK.net.http.serve(async (request: Request): Promise<Response> => {
         const { name, email, message, turnstileToken } = body;
         if (!name?.trim() || !email?.trim() || !message?.trim() || !turnstileToken) {
           return json({ error: "Missing required fields" }, 400, origin);
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+          return json({ error: "Invalid email address" }, 400, origin);
         }
 
         const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;

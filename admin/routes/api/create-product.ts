@@ -53,7 +53,10 @@ export const handler = {
       const fileData = new Uint8Array(await file.arrayBuffer());
       const cdnUrl = await uploadToBunny(fileData, file.name, bunnyConfig);
 
-      const metadata: Record<string, string> = { image_url: cdnUrl };
+      const metadata: Record<string, string> = {
+        web_url: cdnUrl,
+        print_url: `${cdnUrl}?noOptimization=true`,
+      };
       if (photoDate) metadata.photo_date = photoDate;
 
       const product = await stripe.products.create({

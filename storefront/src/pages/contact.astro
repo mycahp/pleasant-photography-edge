@@ -202,15 +202,36 @@ const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 			// @ts-ignore — Turnstile adds this to window
 			const turnstileToken = (window.turnstile?.getResponse() as string | undefined) ?? '';
 
-			if (!name || !email || !message) {
-				statusEl.textContent = 'please fill in all fields.';
+			if (!name) {
+				statusEl.textContent = 'Please enter your name.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+				return;
+			}
+
+			if (!email) {
+				statusEl.textContent = 'Please enter your email.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+				return;
+			}
+
+			if (!message) {
+				statusEl.textContent = 'Please enter a message.';
+				statusEl.className = 'error';
+				statusEl.style.display = 'block';
+				return;
+			}
+
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+				statusEl.textContent = 'Please enter a valid email address.';
 				statusEl.className = 'error';
 				statusEl.style.display = 'block';
 				return;
 			}
 
 			if (!turnstileToken) {
-				statusEl.textContent = 'please complete the CAPTCHA.';
+				statusEl.textContent = 'Please complete the CAPTCHA.';
 				statusEl.className = 'error';
 				statusEl.style.display = 'block';
 				return;
@@ -239,7 +260,7 @@ const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 				statusEl.className = 'success';
 				statusEl.style.display = 'block';
 			} catch (err) {
-				statusEl.textContent = err instanceof Error ? err.message : 'something went wrong, please try again.';
+				statusEl.textContent = err instanceof Error ? err.message : 'Something went wrong, please try again.';
 				statusEl.className = 'error';
 				statusEl.style.display = 'block';
 			} finally {

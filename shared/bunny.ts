@@ -11,7 +11,7 @@ export async function uploadToBunny(
   config: BunnyConfig,
 ): Promise<string> {
   const region = config.storageRegion || "storage.bunnycdn.com";
-  const path = `pleasant-photography-storefront/${fileName}`;
+  const path = `storefront/products/${fileName}`;
   const url = `https://${region}/${config.storageZone}/${path}`;
 
   const res = await fetch(url, {
